@@ -31,4 +31,4 @@ mongoose.connect(process.env.DB_CONNECTION,
 });
 
 //listen
-app.listen(3000, ()=> console.log("server is up"));
+app.listen(process.env.PORT ||3000, ()=> console.log("server is up"));
