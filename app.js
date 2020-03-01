@@ -12,10 +12,15 @@ app.use(express.json());
 //imports routes
 const postRoute = require('./routes/post');
 const authRoute = require('./routes/auth');
+const jobsRoute = require('./routes/jobs');
+const jobTypesRoute = require('./routes/jobTypes');
 
 //routes middleware
 app.use('/api/posts', postRoute);
 app.use('/api/user',authRoute);
+app.use('/api/jobs',jobsRoute);
+app.use('/api/jobtypes',jobTypesRoute);
+
 //ROUTES
 app.get('/',(req, res)=>{
     res.send('we are about to begin');
