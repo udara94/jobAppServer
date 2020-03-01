@@ -1,13 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const JobTypeItem = require('../models/JobTypeItem');
+const JobTypeItemList = require('../models/JobTypeItemList')
 const verify = require('./veriftToken');
 
 //get all jobs
 router.get('/', async (req, res) =>{
     try{
-        const jobTypes = await JobTypeItem.find();
-        res.json(jobTypes);
+        const jobTypes = await JobTypeItem.find();    
+        const jobTypeItemList = new JobTypeItemList({
+            jobTypeItemList : jobTypes 
+         });
+        res.json(jobTypeItemList);
     }catch(err){
         res.json({
             message: err
