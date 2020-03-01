@@ -7,6 +7,18 @@ const jobItemListSchema = mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('jobItemList', jobItemListSchema);
+const jobRoleSchema = mongoose.Schema({
+    jobRoleList: {
+        type:Array,
+        required: true
+    }
+});
+
+var jobItemList = mongoose.model('jobItemList', jobItemListSchema);
+var jobRoleList = mongoose.model('jobRoleList', jobRoleSchema);
+module.exports = {
+    jobItemList:jobItemList,
+    jobRoleList: jobRoleList
+}
 
     

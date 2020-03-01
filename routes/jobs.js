@@ -2,8 +2,10 @@ const express = require('express');
 const router = express.Router();
 const JobItem = require('../models/JobItem');
 const JobTypeItem = require('../models/JobTypeItem');
-const JobItemList = require('../models/JobItemList');
+const JobItemList = require('../models/JobItemList').jobItemList;
+const jobRoleList = require('../models/JobItemList').jobRoleList;
 const verify = require('./veriftToken');
+const JobUtils = require('./JobUtils');
 
 //get all jobs
 // router.get('/',verify, async (req, res) =>{
@@ -19,7 +21,7 @@ const verify = require('./veriftToken');
 
 
 //get all jobs by job type
-router.get('/', async (req, res) =>{
+router.get('/', verify, async (req, res) =>{
     try{
       const jobs = await JobItem.find({jobType: req.query.jobType});
       const jobItemList = new JobItemList({
@@ -33,6 +35,40 @@ router.get('/', async (req, res) =>{
     }
  })
 
+ //get job roles by job type
+ router.get('/getjobrolebytype', verify, async (req, res) =>{
+    try{
+      const jobs = await JobItem.find({jobType: req.query.jobType});
+      var jobRoleArry = new Array();
+
+      jobs.forEach(element =>{
+         // console.log(element.jobRole);
+          if(!jobRoleArry.includes(element.jobRole)){
+              jobRoleArry.push(element.jobRole);
+          }
+      });
+
+      const response = new jobRoleList({
+        jobRoleList : jobRoleArry
+      })
+
+    console.log(response)
+        res.json(response);
+    }catch(err){
+        res.json({
+            message: err
+        });
+    }
+ })
+
+ function inArray(jobRole, jobRoleArry) {
+    var length = jobRoleArry.length;
+    for(var i = 0; i < length; i++) {
+        if(jobRoleArry[i] == jobRole)
+            return true;
+    }
+    return false;
+}
  
  //submit a job
  router.post('/', verify ,async (req, res)=>{
