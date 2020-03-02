@@ -62,15 +62,30 @@ router.get('/', verify, async (req, res) =>{
     }
  })
 
- function inArray(jobRole, jobRoleArry) {
-    var length = jobRoleArry.length;
-    for(var i = 0; i < length; i++) {
-        if(jobRoleArry[i] == jobRole)
-            return true;
+ // get the job list by job role and job type
+ router.get('/getjobsbyjobrole', verify, async (req, res) =>{
+    try{
+      const jobs = await JobItem.find({
+          jobType: req.query.jobType,
+          jobRole: req.query.jobRole
+    });
+
+    const jobItemList = new JobItemList({
+        jobItemList : jobs ,
+        jobType: req.query.jobType,
+        jobRole: req.query.jobRole
+     });
+
+    console.log(jobItemList)
+        res.json(jobItemList);
+    }catch(err){
+        res.json({
+            message: err
+        });
     }
-    return false;
-}
- 
+ })
+
+
  //submit a job
  router.post('/', verify ,async (req, res)=>{
      const job = new JobItem({
