@@ -8,6 +8,9 @@ const jobItemListSchema = mongoose.Schema({
     jobType:{
         type:String,
         required: true
+    },
+    jobRole:{
+        type:String
     }
 });
 
