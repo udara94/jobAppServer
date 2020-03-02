@@ -25,7 +25,8 @@ router.get('/', verify, async (req, res) =>{
     try{
       const jobs = await JobItem.find({jobType: req.query.jobType});
       const jobItemList = new JobItemList({
-        jobItemList : jobs 
+        jobItemList : jobs ,
+        jobType: req.query.jobType
      });
         res.json(jobItemList);
     }catch(err){

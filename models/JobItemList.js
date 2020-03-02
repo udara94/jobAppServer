@@ -4,6 +4,10 @@ const jobItemListSchema = mongoose.Schema({
     jobItemList: {
         type:Array,
         required: true
+    },
+    jobType:{
+        type:String,
+        required: true
     }
 });
 
