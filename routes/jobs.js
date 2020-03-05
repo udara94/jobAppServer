@@ -34,7 +34,7 @@ router.get('/', verify, async (req, res) =>{
             message: err
         });
     }
- })
+ });
 
  //get job roles by job type
  router.get('/getjobrolebytype', verify, async (req, res) =>{
@@ -60,9 +60,9 @@ router.get('/', verify, async (req, res) =>{
             message: err
         });
     }
- })
+ });
 
- // get the job list by job role and job type
+ // get the job list by job role and jobtype
  router.get('/getjobsbyjobrole', verify, async (req, res) =>{
     try{
       const jobs = await JobItem.find({
@@ -83,7 +83,7 @@ router.get('/', verify, async (req, res) =>{
             message: err
         });
     }
- })
+ });
 
 
  //submit a job
@@ -128,7 +128,7 @@ router.get('/', verify, async (req, res) =>{
      }catch(err){
          res.json({message: err});
      }
- })
+ });
  
  //delete specific post
  router.delete('/:postId', verify, async(req, res)=>{
@@ -139,7 +139,7 @@ router.get('/', verify, async (req, res) =>{
          res.json({message: err});
      }
    
- })
+ });
  
  // update post
  router.patch('/:postId', verify, async(req, res)=>{
@@ -152,5 +152,5 @@ router.get('/', verify, async (req, res) =>{
      }catch(err){
          res.json({ message: err});
      }
- })
+ });
  module.exports = router;
