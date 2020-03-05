@@ -62,7 +62,7 @@ router.get('/', verify, async (req, res) =>{
     }
  });
 
- // get the job list by job role and job type
+ // get the job list by job role and jobtype
  router.get('/getjobsbyjobrole', verify, async (req, res) =>{
     try{
       const jobs = await JobItem.find({
