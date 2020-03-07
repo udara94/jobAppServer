@@ -4,10 +4,14 @@ const JobTypeItem = require('../models/JobTypeItem');
 const JobTypeItemList = require('../models/JobTypeItemList')
 const verify = require('./veriftToken');
 
+router.get('/expired', verify, async (req, res) =>{
+    console.log("ododsofdsfj")
+ });
+
 //get all jobs
 router.get('/', async (req, res) =>{
     try{
-        const jobTypes = await JobTypeItem.find();    
+        const jobTypes = await JobTypeItem.find();  
         const jobTypeItemList = new JobTypeItemList({
             jobTypeItemList : jobTypes 
          });
@@ -18,6 +22,8 @@ router.get('/', async (req, res) =>{
         });
     }
  })
+
+
  
  //submit a job
  router.post('/', verify ,async (req, res)=>{
