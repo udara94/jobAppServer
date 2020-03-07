@@ -6,6 +6,8 @@ const JobItemList = require('../models/JobItemList').jobItemList;
 const jobRoleList = require('../models/JobItemList').jobRoleList;
 const verify = require('./veriftToken');
 const JobUtils = require('./JobUtils');
+const moment = require('compare-dates');
+const OpenJobs = require('./JobUtils');
 
 //get all jobs
 // router.get('/',verify, async (req, res) =>{
@@ -20,75 +22,115 @@ const JobUtils = require('./JobUtils');
 //  })
 
 
+router.get('/expired', verify, async (req, res) => {
+    try {
+        const jobs = await JobItem.find();
+        var jobListArry = new Array();
+        jobListArry = OpenJobs.getExpiredJobs(jobs)
+
+        const jobItemList = new JobItemList({
+            jobItemList: jobListArry,
+            jobType: "okok"
+        });
+
+        console.log(jobItemList)
+        res.json(jobItemList);
+    } catch (err) {
+        res.status(400).send('Bad request');
+    }
+});
+//==================================================================
 //get all jobs by job type
-router.get('/', verify, async (req, res) =>{
-    try{
-      const jobs = await JobItem.find({jobType: req.query.jobType});
-      const jobItemList = new JobItemList({
-        jobItemList : jobs ,
-        jobType: req.query.jobType
-     });
-        res.json(jobItemList);
-    }catch(err){
-        res.json({
-            message: err
+//api/jobs
+//===================================================================
+router.get('/', verify, async (req, res) => {
+    try {
+
+        const limit = Math.max(0, req.query.limit)
+        const offset = Math.max(0, req.query.offset)
+
+        const jobs = await JobItem.find({ jobType: req.query.jobType })
+            .limit(limit)
+            .skip(offset);
+
+        console.log(limit);
+        console.log(offset);
+        var jobListArry = new Array();
+        jobListArry = OpenJobs.getOpenJobs(jobs);
+
+        const jobItemList = new JobItemList({
+            jobItemList: jobListArry,
+            jobType: req.query.jobType
         });
+        res.json(jobItemList);
+    } catch (err) {
+        res.status(400).send('Bad request');
     }
- });
+});
 
- //get job roles by job type
- router.get('/getjobrolebytype', verify, async (req, res) =>{
-    try{
-      const jobs = await JobItem.find({jobType: req.query.jobType});
-      var jobRoleArry = new Array();
+//===================================================================
+//get job roles by job type
+//===================================================================
+router.get('/getjobrolebytype', verify, async (req, res) => {
+    try {
+        const jobs = await JobItem.find({ jobType: req.query.jobType });
+        var jobRoleArry = new Array();
+        jobRoleArry = OpenJobs.getJobRoleByJobType(jobs);
 
-      jobs.forEach(element =>{
-         // console.log(element.jobRole);
-          if(!jobRoleArry.includes(element.jobRole)){
-              jobRoleArry.push(element.jobRole);
-          }
-      });
-
-      const response = new jobRoleList({
-        jobRoleList : jobRoleArry
-      })
-
-    console.log(response)
+        const response = new jobRoleList({
+            jobRoleList: jobRoleArry
+        });
+        console.log(response)
         res.json(response);
-    }catch(err){
-        res.json({
-            message: err
-        });
+    } catch (err) {
+        res.status(400).send('Bad request');
     }
- });
+});
 
- // get the job list by job role and jobtype
- router.get('/getjobsbyjobrole', verify, async (req, res) =>{
-    try{
-      const jobs = await JobItem.find({
-          jobType: req.query.jobType,
-          jobRole: req.query.jobRole
-    });
+//=====================================================================
+// get the job list by job role and jobtype
+//=====================================================================
+router.get('/getjobsbyjobrole', verify, async (req, res) => {
+    try {
 
-    const jobItemList = new JobItemList({
-        jobItemList : jobs ,
-        jobType: req.query.jobType,
-        jobRole: req.query.jobRole
-     });
+        const jobs = await JobItem.find({
+            jobType: req.query.jobType,
+            jobRole: req.query.jobRole
+        });
 
-    console.log(jobItemList)
+        var jobListArry = new Array();
+        jobListArry = OpenJobs.getOpenJobs(jobs);;
+
+        const jobItemList = new JobItemList({
+            jobItemList: jobListArry,
+            jobType: req.query.jobType,
+            jobRole: req.query.jobRole
+        });
+
+        //console.log(jobItemList)
         res.json(jobItemList);
-    }catch(err){
-        res.json({
-            message: err
-        });
+    } catch (err) {
+        res.status(400).send('Bad request');
     }
- });
+});
 
+//=========================================================
+// get specific job
+//=========================================================
+router.get('/:jobId', verify, async (req, res) => {
+    try {
+        const post = await JobItem.findById(req.params.jobId);
+        res.json(post);
+    } catch (err) {
+        res.status(400).send('Bad request');
+    }
+});
 
- //submit a job
- router.post('/', verify ,async (req, res)=>{
-     const job = new JobItem({
+//========================================================================
+//submit a job
+//======================================================================
+router.post('/', verify, async (req, res) => {
+    const job = new JobItem({
         jobId: req.body.jobId,
         jobType: req.body.jobType,
         jobDescription: req.body.jobDescription,
@@ -98,9 +140,9 @@ router.get('/', verify, async (req, res) =>{
         imgUrl: req.body.imgUrl,
         closingDate: req.body.closingDate,
         isExpired: req.body.isExpired,
-     });
- 
-     try{
+    });
+
+    try {
 
         //saving new job in job list
         const savedJob = await job.save()
@@ -109,48 +151,42 @@ router.get('/', verify, async (req, res) =>{
         var jobTypeId = req.body.jobType;
         const post = await JobTypeItem.findById(jobTypeId);
         var jobCount = parseInt(post.jobCount) + 1;
-         
+
         const updateJobType = await JobTypeItem.updateOne(
-            {_id: jobTypeId},
-            {$set: {jobCount:jobCount.toString()}}
+            { _id: jobTypeId },
+            { $set: { jobCount: jobCount.toString() } }
         );
-         res.json(savedJob);
-     }catch(err){
-         res.json({message: err});
-     }
- });
- 
- // specific job
- router.get('/:jobId', verify, async(req, res)=>{
-     try{
-         const post = await JobItem.findById(req.params.jobId);
-         res.json(post);
-     }catch(err){
-         res.json({message: err});
-     }
- });
- 
- //delete specific post
- router.delete('/:postId', verify, async(req, res)=>{
-     try{
-         const removePost = await Post.remove({ _id : req.params.postId});
-         res.json(removePost);
-     }catch(err){
-         res.json({message: err});
-     }
-   
- });
- 
- // update post
- router.patch('/:postId', verify, async(req, res)=>{
-     try{
-         const updatePost = await Post.updateOne(
-             {_id: req.params.postId},
-             {$set: {title: req.body.title}}
-         );
-         res.json(updatePost);
-     }catch(err){
-         res.json({ message: err});
-     }
- });
- module.exports = router;
+        res.json(savedJob);
+    } catch (err) {
+        res.status(400).send('Bad request');
+    }
+});
+
+//========================================================
+// update post
+//=========================================================
+router.patch('/:postId', verify, async (req, res) => {
+    try {
+        const updatePost = await Post.updateOne(
+            { _id: req.params.postId },
+            { $set: { title: req.body.title } }
+        );
+        res.json(updatePost);
+    } catch (err) {
+        res.status(400).send('Bad request');
+    }
+});
+
+//=================================================================
+//delete specific post
+//=================================================================
+router.delete('/:postId', verify, async (req, res) => {
+    try {
+        const removePost = await Post.remove({ _id: req.params.postId });
+        res.json(removePost);
+    } catch (err) {
+        res.status(400).send('Bad request');
+    }
+
+});
+module.exports = router;

@@ -1,14 +1,52 @@
 
 
-module.exports =  function getJobRoles(req, res, next){
-    // const token = req.header('auth-token');
-    // if(!token) return res.status(401).send('Access Denied');
 
-    // try{
-    //     const varified = jwt.verify(token, process.env.TOKEN_SECRET);
-    //     req.user = varified;
-    //     next();
-    // }catch(err){
-    //     res.status(400).send('Invalid Token')
-    // }
+
+//function to get the open jobs
+function getOpenJobs(jobs){
+    var jobListArry = new Array();
+
+    jobs.forEach(element =>{
+        var currentDate = new Date().toLocaleDateString("en-US");
+        var closingDate = new Date(Date.parse(element.closingDate)).toLocaleDateString("en-US");
+        if(Date.parse(closingDate) > Date.parse(currentDate)){
+            jobListArry.push(element);
+        }
+    });
+   return jobListArry;
 }
+
+//function to get the expired jobs
+function getExpiredJobs(jobs){
+    var jobListArry = new Array();
+
+    jobs.forEach(element =>{
+        var currentDate = new Date().toLocaleDateString("en-US");
+        var closingDate = new Date(Date.parse(element.closingDate)).toLocaleDateString("en-US");
+        if(Date.parse(closingDate) < Date.parse(currentDate)){
+            jobListArry.push(element);
+        }
+    });
+   return jobListArry;
+}
+
+// function to get the job role by job type
+function getJobRoleByJobType(jobs){
+
+    var jobRoleArry = new Array();
+    jobs.forEach(element =>{
+        // console.log(element.jobRole);
+         if(!jobRoleArry.includes(element.jobRole)){
+             jobRoleArry.push(element.jobRole);
+         }
+     });
+
+     return jobRoleArry;
+}
+
+//===========================================
+//            Export Functions
+//============================================
+module.exports.getOpenJobs =  getOpenJobs;
+module.exports.getExpiredJobs = getExpiredJobs;
+module.exports.getJobRoleByJobType = getJobRoleByJobType;
