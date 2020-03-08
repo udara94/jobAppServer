@@ -19,7 +19,7 @@ router.get('/isfavourite', verify, async(req, res)=>{
             jobId : req.query._id
         });
 
-        var status;
+        var status = false;
 
         if(favJob == 0){
             status = false;
