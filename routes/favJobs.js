@@ -28,7 +28,7 @@ router.get('/isfavourite', verify, async(req, res)=>{
         }
         
         const favStatus = new FavStatus({
-            status: status
+            isExist: status
         });
 
         res.json(favStatus);
