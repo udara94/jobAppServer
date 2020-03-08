@@ -9,17 +9,26 @@ const JobUtils = require('./JobUtils');
 const moment = require('compare-dates');
 const OpenJobs = require('./JobUtils');
 
-//get all jobs
-// router.get('/',verify, async (req, res) =>{
-//     try{
-//         const jobs = await JobItem.find();
-//         res.json(jobs);
-//     }catch(err){
-//         res.json({
-//             message: err
-//         });
-//     }
-//  })
+//search by key words
+router.get('/search',verify, async (req, res) =>{
+    try{
+        var key = req.query.key;
+
+        const jobs = await JobItem.find({
+            "employer": { '$regex' : key, $options:"i"}
+        });
+        var jobListArry = new Array();
+        jobListArry = OpenJobs.getOpenJobs(jobs);
+
+        const jobItemList = new JobItemList({
+            jobItemList: jobListArry,
+            jobType: req.query.jobType
+        });
+        res.json(jobItemList);
+    }catch(err){
+        res.status(400).send('Bad request');
+    }
+ })
 
 
 router.get('/expired', verify, async (req, res) => {
