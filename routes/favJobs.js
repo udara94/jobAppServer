@@ -1,13 +1,42 @@
 const express = require('express');
 const router = express.Router();
 const JobItem = require('../models/JobItem');
-const JobTypeItem = require('../models/JobTypeItem');
 const JobItemList = require('../models/JobItemList').jobItemList;
-const jobRoleList = require('../models/JobItemList').jobRoleList;
 const verify = require('./veriftToken');
 const UserFavJobs = require('../models/User_Fav');
 const mongoose = require('mongoose');
+const FavStatus = require('../models/FavStatus');
 mongoose.Promise = require('bluebird');
+
+
+//=============================================================
+// is favourite job
+//=============================================================
+router.get('/isfavourite', verify, async(req, res)=>{
+    try{
+        const favJob = await UserFavJobs.countDocuments({ 
+            userId : req.user._id,
+            jobId : req.query._id
+        });
+
+        var status;
+
+        if(favJob == 0){
+            status = false;
+        }else{
+            status = true;
+        }
+        
+        const favStatus = new FavStatus({
+            status: status
+        });
+
+        res.json(favStatus);
+    }catch(err){
+        res.json({message: err});
+    }
+  
+});
 
 //========================================================
 //get fav jobs
