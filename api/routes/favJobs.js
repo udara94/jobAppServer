@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const JobItem = require('../models/JobItem');
-const JobItemList = require('../models/JobItemList').jobItemList;
+const JobItem = require('../../models/JobItem');
+const JobItemList = require('../../models/JobItemList').jobItemList;
 const verify = require('./veriftToken');
-const UserFavJobs = require('../models/User_Fav');
+const UserFavJobs = require('../../models/User_Fav');
 const mongoose = require('mongoose');
-const FavStatus = require('../models/FavStatus');
+const FavStatus = require('../../models/FavStatus');
 mongoose.Promise = require('bluebird');
 
 

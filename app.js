@@ -10,14 +10,14 @@ app.use(bodyParser.json());
 app.use(express.json());
 
 //imports routes
-const postRoute = require('./routes/post');
-const authRoute = require('./routes/auth');
-const jobsRoute = require('./routes/jobs');
-const jobTypesRoute = require('./routes/jobTypes');
-const jobFavRoute = require('./routes/favJobs');
+//const postRoute = require('./api/routes/post');
+const authRoute = require('./api/routes/auth');
+const jobsRoute = require('./api/routes/jobs');
+const jobTypesRoute = require('./api/routes/jobTypes');
+const jobFavRoute = require('./api/routes/favJobs');
 
 //routes middleware
-app.use('/api/posts', postRoute);
+//app.use('/api/posts', postRoute);
 app.use('/api/user',authRoute);
 app.use('/api/jobs',jobsRoute);
 app.use('/api/jobtypes',jobTypesRoute);

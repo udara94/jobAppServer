@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const JobTypeItem = require('../models/JobTypeItem');
-const JobTypeItemList = require('../models/JobTypeItemList')
+const JobTypeItem = require('../../models/JobTypeItem');
+const JobTypeItemList = require('../../models/JobTypeItemList')
 const verify = require('./veriftToken');
 
 router.get('/expired', verify, async (req, res) =>{
