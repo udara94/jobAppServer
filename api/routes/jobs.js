@@ -8,6 +8,8 @@ const verify = require('./veriftToken');
 const JobUtils = require('./JobUtils');
 const moment = require('compare-dates');
 const OpenJobs = require('./JobUtils');
+const utilities = require('../../utilities/utilities');
+const JobController = require('../controllers/job');
 
 //search by key words
 router.get('/search',verify, async (req, res) =>{
@@ -138,38 +140,40 @@ router.get('/:jobId', verify, async (req, res) => {
 //========================================================================
 //submit a job
 //======================================================================
-router.post('/', verify, async (req, res) => {
-    const job = new JobItem({
-        jobId: req.body.jobId,
-        jobType: req.body.jobType,
-        jobDescription: req.body.jobDescription,
-        jobRole: req.body.jobRole,
-        employer: req.body.employer,
-        employerEmail: req.body.employerEmail,
-        imgUrl: req.body.imgUrl,
-        closingDate: req.body.closingDate,
-        isExpired: req.body.isExpired,
-    });
+// router.post('/', verify, async (req, res) => {
+//     const job = new JobItem({
+//         jobId: req.body.jobId,
+//         jobType: req.body.jobType,
+//         jobDescription: req.body.jobDescription,
+//         jobRole: req.body.jobRole,
+//         employer: req.body.employer,
+//         employerEmail: req.body.employerEmail,
+//         imgUrl: req.body.imgUrl,
+//         closingDate: req.body.closingDate,
+//         isExpired: req.body.isExpired,
+//     });
 
-    try {
+//     try {
 
-        //saving new job in job list
-        const savedJob = await job.save()
+//         //saving new job in job list
+//         const savedJob = await job.save()
 
-        //get the jobtype id and update the job count by one
-        var jobTypeId = req.body.jobType;
-        const post = await JobTypeItem.findById(jobTypeId);
-        var jobCount = parseInt(post.jobCount) + 1;
+//         //get the jobtype id and update the job count by one
+//         var jobTypeId = req.body.jobType;
+//         const post = await JobTypeItem.findById(jobTypeId);
+//         var jobCount = parseInt(post.jobCount) + 1;
 
-        const updateJobType = await JobTypeItem.updateOne(
-            { _id: jobTypeId },
-            { $set: { jobCount: jobCount.toString() } }
-        );
-        res.json(savedJob);
-    } catch (err) {
-        res.status(400).send('Bad request');
-    }
-});
+//         const updateJobType = await JobTypeItem.updateOne(
+//             { _id: jobTypeId },
+//             { $set: { jobCount: jobCount.toString() } }
+//         );
+//         //utilities.create_activity(user._id,tour._id,"likes")
+//         res.json(savedJob);
+//     } catch (err) {
+//         res.status(400).send('Bad request');
+//     }
+// });
+router.post('/', verify, JobController.add_new_job);
 
 //========================================================
 // update post

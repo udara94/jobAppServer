@@ -15,6 +15,7 @@ const authRoute = require('./api/routes/auth');
 const jobsRoute = require('./api/routes/jobs');
 const jobTypesRoute = require('./api/routes/jobTypes');
 const jobFavRoute = require('./api/routes/favJobs');
+const fcmRoute = require('./api/routes/fcm');
 
 //routes middleware
 //app.use('/api/posts', postRoute);
@@ -22,6 +23,7 @@ app.use('/api/user',authRoute);
 app.use('/api/jobs',jobsRoute);
 app.use('/api/jobtypes',jobTypesRoute);
 app.use('/api/favjobs', jobFavRoute);
+app.use('/api/fcm', fcmRoute);
 
 //ROUTES
 app.get('/',(req, res)=>{
