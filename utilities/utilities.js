@@ -2,7 +2,7 @@ const User = require('../models/User');
 const Activity = require('../models/activity');
 const MyNotification = require('../models/mynotification');
 //const Tour = require('../../models/tour');
-const Fcm = require('../api/controllers/fcm');
+const Fcm = require('../api/controllers/fcmController');
 const mongoose = require('mongoose');
 const path = require('path');
 
