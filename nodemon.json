@@ -1,0 +1,10 @@
+{
+  "env": {
+    "BASE_URL": "",
+    "MPNGO_ATLAS_PW": "",
+    "JWT_KEY": "",
+    "GMAILPW": "",
+    "MAIL_CLIENT": "",
+    "TOKEN_SECRET" :"apic_jobs"
+  }
+}
