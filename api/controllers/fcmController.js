@@ -22,7 +22,7 @@ exports.user_register_fcm_token = (req, res, next) => {
             console.log(fcm)
           if(fcm){
             
-            Fcm.updateOne({userId: user._id}, {fcmtoken: "5e6b374aa5d"})
+            Fcm.updateOne({userId: user._id}, {fcmtoken: req.body.fcmtoken})
               .exec()
               .then(result => {
                 //console.log(result);
