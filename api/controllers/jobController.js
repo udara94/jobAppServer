@@ -22,6 +22,7 @@ exports.add_new_job = (req, res) => {
             var jobType = result.jobType;
 
             update_job_count(jobType, true, 0);
+           // utilities.create_activity("abc","abc","likes")
             res.status(200).json({
                 message: "Job Crated Successfully"
             });
