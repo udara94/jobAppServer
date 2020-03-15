@@ -39,7 +39,7 @@ exports.user_register_fcm_token = (req, res, next) => {
             const fcm = new Fcm({
               _id: new mongoose.Types.ObjectId(),
               userId: user._id,
-              fcmtoken: "5e6b374aa5d"
+              fcmtoken: req.body.fcmtoken
             });
             fcm
               .save()
