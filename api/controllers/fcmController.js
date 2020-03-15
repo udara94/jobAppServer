@@ -1,13 +1,13 @@
 const Fcm = require('../../models/fcm');
 var admin = require("firebase-admin");
-var serviceAccount = require("../../firebase-adminsdk");
+var serviceAccount = require("../../apic-jobs-firebase-adminsdk");
 const mongoose = require('mongoose');
 const User = require('../../models/User');
 const HtmlString = require('../../utilities/generateHTMLString');
 
 admin.initializeApp({
  credential: admin.credential.cert(serviceAccount),
- databaseURL: "https://fcmtoken-45f7f.firebaseio.com"
+ databaseURL: "https://apic-jobs.firebaseio.com"
 });
 
 exports.user_register_fcm_token = (req, res, next) => {
