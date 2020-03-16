@@ -10,44 +10,80 @@ exports.user_signup = (req, res) => {
   const { error } = registerValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-
   //checking if the user is already in the database
-  //const emialExist = 
-  User.find({ email: req.body.email })
+  User.find({ mobile: req.body.mobile })
     .exec()
     .then(user => {
+      console.log("is user: " + user.length)
       if (user.length >= 1) {
-        return res.status(409).json({
-          message: 'Mail exists'
-        })
-      } else {
-        bcrypt.hash(req.body.password, 10, (err, hash) => {
-          if (err) {
-            return res.status(500).json({
-              message: err.message
-            });
-          } else {
-
-            //create new user
-            const userModel = new User({
-              name: req.body.name,
-              email: req.body.email,
-              password: hash
-            })
-            userModel
-              .save()
-              .then(result => {
-                console.log(result);
-                res.status(201).json({
-                  message: 'User created'
-                });
-              }).catch(err => {
+        //login
+            const token = jwt.sign(
+              {
+                mobile: user[0].mobile,
+                userId: user[0]._id
+              },
+              process.env.TOKEN_SECRET,
+              {
+                expiresIn: "48h"
+              }
+            );
+            User.update({ mobile:  req.body.mobile },
+              {
+                auth: token,
+              }).exec()
+              .catch(err => {
+                console.log(err);
                 res.status(500).json({
                   message: err.message
                 });
               });
-          }
-        });
+            return res.status(200).json({
+              message: 'Auth Successful',
+              token: token,
+              userId: user[0]._id,
+              mobile: user[0].mobile
+            });
+          
+      } else {
+          //create new user
+          const userModel = new User({
+            mobile: req.body.mobile,
+          })
+          userModel
+            .save()
+            .then(result => {
+              const token = jwt.sign(
+                {
+                  mobile: result.mobile,
+                  userId: result._id
+                },
+                process.env.TOKEN_SECRET,
+                {
+                  expiresIn: "48h"
+                }
+              );
+              User.update({ mobile:   result.mobile },
+                {
+                  auth: token,
+                }).exec()
+                .catch(err => {
+                  console.log(err);
+                  res.status(500).json({
+                    message: err.message
+                  });
+                });
+              return res.status(200).json({
+                message: 'Auth Successful',
+                token: token,
+                userId: result._id,
+                mobile: result.mobile
+              });
+            }).catch(err => {
+              res.status(500).json({
+                message: err.message
+              });
+            });
+
       }
     })
     .catch(err => {
@@ -59,13 +95,54 @@ exports.user_signup = (req, res) => {
 
 }
 
+function user_login(mobile, user) {
+  bcrypt.compare(mobile, user.mobile, (err, result) => {
+    if (err) {
+      return res.status(401).json({
+        message: "Auth failed"
+      });
+    }
+    if (result) {
+      const token = jwt.sign(
+        {
+          mobile: user.mobile,
+          userId: user._id
+        },
+        process.env.TOKEN_SECRET,
+        {
+          expiresIn: "48h"
+        }
+      );
+      User.update({ mobile: mobile },
+        {
+          auth: token,
+        }).exec()
+        .catch(err => {
+          console.log(err);
+          res.status(500).json({
+            message: err.message
+          });
+        });
+      return res.status(200).json({
+        message: 'Auth Successful',
+        token: token,
+        userId: user._id,
+        mobile: mobile
+      });
+    }
+    res.status(401).json({
+      message: "Auth failed"
+    });
+  });
+}
+
 exports.user_login = (req, res) => {
   //validate data
   const { error } = loginValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   //checking if the user is already in the database
-  User.find({ email: req.body.email })
+  User.find({ mobile: req.body.email })
     .exec()
     .then(user => {
       if (user.length < 1) {
