@@ -2,6 +2,7 @@ const User = require('../../models/User');
 const { registerValidation, loginValidation } = require('../../validation');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const FcmTemp = require('../../models/FcmTemp');
 
 
 exports.user_signup = (req, res) => {
@@ -52,6 +53,7 @@ exports.user_signup = (req, res) => {
           userModel
             .save()
             .then(result => {
+              delete_tempToken(req.body.fcmtoken);
               const token = jwt.sign(
                 {
                   mobile: result.mobile,
@@ -93,6 +95,19 @@ exports.user_signup = (req, res) => {
       });
     });
 
+}
+
+function delete_tempToken(fcmToken) {
+      FcmTemp.deleteMany({
+        fcmtoken: fcmToken
+      })
+      .exec()
+      .then(fcmTemp => {
+              console.log("Successfully deleted");
+          })
+          .catch(err => {
+              console.log(err);
+          })
 }
 
 function user_login(mobile, user) {
