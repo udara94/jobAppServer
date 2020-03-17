@@ -135,6 +135,23 @@ exports.user_register_fcm_token = (req, res, next) => {
         .catch(err => {
           console.log(err);
         });
+
+      FcmTemp.find()
+      .exec()
+      .then(tempTokens => {
+        var tempTokenList = []
+        tempTokens.forEach((eachToken) => {
+              if(eachToken.fcmtoken)
+                tempTokenList.push(eachToken.fcmtoken)
+          });
+
+          if(tempTokenList && tempTokenList.length > 0){
+            tigerToAll(activity, tempTokenList);
+          }
+      })
+      .catch(err => {
+        console.log(err);
+      });
     } else {
         console.log("Notification Not Found");
     }
