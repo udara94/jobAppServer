@@ -1,4 +1,5 @@
 const Fcm = require('../../models/fcm');
+const FcmTemp = require('../../models/FcmTemp');
 var admin = require("firebase-admin");
 var serviceAccount = require("../../apic-jobs-firebase-adminsdk");
 const mongoose = require('mongoose');
@@ -9,6 +10,41 @@ admin.initializeApp({
  credential: admin.credential.cert(serviceAccount),
  databaseURL: "https://apic-jobs.firebaseio.com"
 });
+
+exports.register_fcm_token_without_user = (req, res) =>{
+  FcmTemp.findOne({fcmtoken: req.body.fcmtoken})
+  .exec()
+  .then(fcmTemp => {
+    if(fcmTemp){
+      res.status(200).json({
+        message: 'FCM Token Update Successful.'
+      });
+    } else{
+      const fcmToken = new FcmTemp({
+        _id: new mongoose.Types.ObjectId(),
+        fcmtoken: req.body.fcmtoken
+      });
+      fcmToken
+        .save()
+        .then(result => {
+          res.status(201).json({
+            message: 'FCM Token Registration Successful.'
+          });
+        })
+        .catch(err => {
+          res.status(500).json({
+            message: err.message
+          });
+        });
+    }
+  })
+  .catch(err => {
+    //console.log(err);
+    res.status(500).json({
+      message: err.message
+    });
+  });
+}
 
 exports.user_register_fcm_token = (req, res, next) => {
     //console.log("user id: "+req.user.userId)
