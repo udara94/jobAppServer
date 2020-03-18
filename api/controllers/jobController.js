@@ -4,6 +4,8 @@ const jobRoleList = require('../../models/JobItemList').jobRoleList;
 const utilities = require('../../utilities/utilities');
 const OpenJobs = require('../../utilities/JobUtils');
 const JobTypeItem = require('../../models/JobTypeItem');
+const Notification = require('../../models/Notification');
+const NotificationController = require('../controllers/notificationController');
 
 exports.add_new_job = (req, res) => {
     const job = new JobItem({
@@ -19,10 +21,18 @@ exports.add_new_job = (req, res) => {
     })
     job.save()
         .then(result => {
+            console.log(result);
             var jobType = result.jobType;
 
+            //update the job count
             update_job_count(jobType, true, 0);
-            utilities.create_activity("5e6b6d72e8416f3ef89c8745","5e6b6d72e8416f3ef89c8745","likes")
+
+            //add notification to notification document
+            //add_notification(result);
+            NotificationController.add_notification(result);
+
+            //create notifiaction
+            //utilities.create_activity("5e6b6d72e8416f3ef89c8745","5e6b6d72e8416f3ef89c8745","likes")
             res.status(200).json({
                 message: "Job Crated Successfully"
             });
@@ -34,6 +44,7 @@ exports.add_new_job = (req, res) => {
             });
         })
 }
+
 
 //search jobs
 exports.search_jobs = (req, res) => {
