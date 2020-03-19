@@ -13,12 +13,13 @@ exports.get_subscribed_job_types = (req, res) => {
             var subsJobsArray = [];
 
             jobTyps.forEach(element => {
-                jobTypeArry.push(element.jobType);
+                jobTypeArry.push(element);
             })
 
             SubscribeJobTypes.find({
                 userId: req.user.userId
             })
+            .select('jobType')
                 .exec()
                 .then(subsResult => {
                     subsResult.forEach(function (u) {
@@ -29,7 +30,7 @@ exports.get_subscribed_job_types = (req, res) => {
 
                     var subsArray = new Array();
                     result.forEach(element => {
-                        subsArray.push(element[0].jobType)
+                        subsArray.push(element[0])
                     })
 
                     const subsAndJonTypes = new SubsJobTypeItemList({
