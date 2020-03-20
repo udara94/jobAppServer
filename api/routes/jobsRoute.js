@@ -19,7 +19,7 @@ router.get('/getjobrolebytype', verify, JobController.get_job_role_by_type)
 router.get('/getjobsbyjobrole', verify, JobController.get_jobs_by_job_role )
 
 //get specific job
-router.get('/:jobId', verify, JobController.get_specific_job)
+router.get('/jobId', verify, JobController.get_specific_job)
 
 //submit a job
 router.post('/', verify, JobController.add_new_job);

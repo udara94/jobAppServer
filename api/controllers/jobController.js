@@ -181,7 +181,7 @@ exports.get_jobs_by_job_role = (req, res) => {
 
 exports.get_specific_job = (req, res) => {
 
-    JobItem.findById(req.params.jobId)
+    JobItem.findById(req.query.jobId)
         .exec()
         .then(job => {
             res.status(200).json(job);
