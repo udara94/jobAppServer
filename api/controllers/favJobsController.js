@@ -58,36 +58,63 @@ exports.get_fav_jobs = (req, res) => {
         })
 }
 
-exports.add_fav_job = (req, res) => {
-    const favJob = new UserFavJobs({
-        userId: req.user.userId,
-        jobId: req.query._id,
-    });
-
-    favJob.save()
-        .then(favJob => {
-            res.status(200).json(favJob);
-        })
-        .catch(err => {
-            // console.log(err);
-            res.status(500).json({
-                message: err.message
-            });
-        })
-}
-
-exports.delete_fav_job = (req, res) => {
-
-    UserFavJobs.deleteMany({
-        jobId: req.query._id
-    })
+exports.add_or_delete_fav_job = (req, res) => {
+    console.log(req.user.userId)
+    UserFavJobs.find({ userId: req.user.userId })
         .exec()
-        .then(favJob => {
-            res.status(200).json(favJob);
-        })
-        .catch(err => {
-            res.status(500).json({
-                message: err.message
-            });
+        .then(user => {
+            var favListArry = new Array();
+            user.forEach(element => {
+                favListArry.push(element.jobId);
+            })
+            console.log(favListArry)
+            if (favListArry.indexOf(req.query._id) == -1) {
+                console.log("Not found")
+                const favJob = new UserFavJobs({
+                    userId: req.user.userId,
+                    jobId: req.query._id,
+                });
+
+                favJob.save()
+                    .then(favJob => {
+                        res.status(200).json(favJob);
+                    })
+                    .catch(err => {
+                        // console.log(err);
+                        res.status(500).json({
+                            message: err.message
+                        });
+                    })
+            } else {
+                console.log("fav is found");
+                UserFavJobs.deleteMany({
+                    jobId: req.query._id
+                })
+                    .exec()
+                    .then(favJob => {
+                        res.status(200).json(favJob);
+                    })
+                    .catch(err => {
+                        res.status(500).json({
+                            message: err.message
+                        });
+                    })
+            }
         })
 }
+
+// exports.delete_fav_job = (req, res) => {
+
+//     UserFavJobs.deleteMany({
+//         jobId: req.query._id
+//     })
+//         .exec()
+//         .then(favJob => {
+//             res.status(200).json(favJob);
+//         })
+//         .catch(err => {
+//             res.status(500).json({
+//                 message: err.message
+//             });
+//         })
+// }
