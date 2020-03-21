@@ -6,12 +6,15 @@ const FavStatus = require('../../models/FavStatus');
 mongoose.Promise = require('bluebird');
 
 exports.get_is_favourite = (req, res) => {
+    console.log(req.user.userId)
     UserFavJobs.countDocuments({
-        userId: req.user._id,
+        userId: req.user.userId,
         jobId: req.query._id
     })
         .exec()
         .then(count => {
+
+            console.log(count);
             var status = false;
 
             if (count == 0) {
