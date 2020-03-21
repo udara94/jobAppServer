@@ -13,9 +13,9 @@ router.get('/isfavourite', verify, FavController.get_is_favourite);
 router.get('/getfavjobs', verify, FavController.get_fav_jobs);
 
 //add favourite jobs
-router.post('/addfavjobs', verify, FavController.add_fav_job);
+router.post('/addfavjobs', verify, FavController.add_or_delete_fav_job);
 
 //delete favourite job
-router.delete('/delete', verify, FavController.delete_fav_job)
+// router.delete('/delete', verify, FavController.delete_fav_job)
 
 module.exports = router;
