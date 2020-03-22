@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const JobTypeItemSchema = mongoose.Schema({
+    jobField:{
+        type: String,
+        required: true
+    },
     jobType: {
         type:String,
         required: true
