@@ -6,7 +6,9 @@ mongoose.Promise = require('bluebird');
 
 //get all jobs types
 exports.get_job_types = (req, res) => {
-    JobTypeItem.find()
+    JobTypeItem.find({
+        jobField: req.query.jobField
+    })
         .exec()
         .then(jobTyps => {
             const jobTypeItemList = new JobTypeItemList({
@@ -22,16 +24,10 @@ exports.get_job_types = (req, res) => {
         })
 }
 
-function get_job_count_by_job_type(jobTypeId) {
-    var count = JobItem.countDocuments({
-        jobType: jobTypeId
-    })
-    console.log(count)
-}
-
 //submit a job type
 exports.add_job_type = (req, res) => {
     const jobType = new JobTypeItem({
+        jobField: req.body.jobField,
         jobType: req.body.jobType,
         isDeleted: req.body.isDeleted,
         jobCount: "0"

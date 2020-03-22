@@ -9,6 +9,7 @@ const NotificationController = require('../controllers/notificationController');
 
 exports.add_new_job = (req, res) => {
     const job = new JobItem({
+        jobField: req.body.jobField,
         jobId: req.body.jobId,
         jobType: req.body.jobType,
         jobDescription: req.body.jobDescription,
@@ -52,7 +53,8 @@ exports.search_jobs = (req, res) => {
     var key = req.query.key;
 
     JobItem.find({
-        "employer": { '$regex': key, $options: "i" }
+        "employer": { '$regex': key, $options: "i" },
+        jobField: req.query.jobField
     })
         .exec()
         .then(jobs => {
@@ -102,7 +104,10 @@ exports.get_all_jobs_by_type = (req, res) => {
     const limit = Math.max(0, req.query.limit)
     const offset = Math.max(0, req.query.offset)
 
-    JobItem.find({ jobType: req.query.jobType })
+    JobItem.find({ 
+        jobType: req.query.jobType,
+        jobField: req.query.jobField
+     })
         .limit(limit)
         .skip(offset)
         .exec()
@@ -133,7 +138,8 @@ exports.get_all_jobs_by_type = (req, res) => {
 exports.get_job_role_by_type = (req, res) => {
 
     JobItem.find({
-        jobType: req.query.jobType
+        jobType: req.query.jobType,
+        jobField:req.query.jobField
     })
         .exec()
         .then(jobs => {
@@ -157,7 +163,8 @@ exports.get_jobs_by_job_role = (req, res) => {
 
     JobItem.find({
         jobType: req.query.jobType,
-        jobRole: req.query.jobRole
+        jobRole: req.query.jobRole,
+        jobField:req.query.jobField
     })
         .exec()
         .then(jobs => {
@@ -200,6 +207,7 @@ exports.update_job = (req, res) => {
         { _id: req.query.jobId },
         {
             $set: {
+                jobField:req.query.jobField,
                 jobType: req.body.jobType,
                 jobDescription: req.body.jobDescription,
                 jobRole: req.body.jobRole,
