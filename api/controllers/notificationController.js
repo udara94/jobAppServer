@@ -7,37 +7,19 @@ mongoose.Promise = require('bluebird');
 
 exports.get_all_notifications = (req, res) => {
 
-    // const limit = Math.max(0, req.query.limit)
-    // const offset = Math.max(0, req.query.offset)
+    const limit = Math.max(0, req.query.limit)
+    const offset = Math.max(0, req.query.offset)
 
-    // Notification.find()
-    //     .limit(limit)
-    //     .skip(offset)
-    //     .exec()
-    //     .then(notification => {
-
-    //         const notificationList = new NotificationList({
-    //             notificationList: notification,
-    //         });
-    //         res.status(200).json(notificationList);
-    //     })
-    //     .catch(err => {
-    //         console.log(err);
-    //         res.status(500).json({
-    //             message: err.message
-    //         });
-    //     })
-    // console.log(req.user.userId);
     SubsJobs.countDocuments({userId: req.user.userId})
     .then(count =>{
-        console.log(count);
+        //console.log(count);
         if(count > 0){
             SubsJobs.find({ userId: req.user.userId })
             .exec()
             .then(user => {
                 var jobTypeArry = new Array();
                 var notificationArray = [];
-                // console.log(user);
+                 //console.log(user);
                 user.forEach(element =>{
                     jobTypeArry.push(element.jobType);
                 })
@@ -49,6 +31,7 @@ exports.get_all_notifications = (req, res) => {
                 return Promise.all(notificationArray);
             })
             .then(result =>{
+                //console.log(result)
                 var resultArray = [];
                 result.forEach(element=>{
                    element.forEach(u =>{
@@ -70,6 +53,8 @@ exports.get_all_notifications = (req, res) => {
         }
         else{
             Notification.find()
+            .limit(limit)
+            .skip(offset)
             .exec()
             .then(result =>{
                 const notificationList = new NotificationList({
