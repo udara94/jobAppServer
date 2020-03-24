@@ -12,26 +12,28 @@ exports.get_all_notifications = (req, res) => {
 
     SubsJobs.countDocuments({userId: req.user.userId})
     .then(count =>{
-        //console.log(count);
+        console.log(count);
         if(count > 0){
             SubsJobs.find({ userId: req.user.userId })
             .exec()
             .then(user => {
                 var jobTypeArry = new Array();
                 var notificationArray = [];
-                 //console.log(user);
+                 console.log(user);
                 user.forEach(element =>{
                     jobTypeArry.push(element.jobType);
                 })
     
                 jobTypeArry.forEach(function (u) {
-                    notificationArray.push(Notification.find({jobType:u}));
+                    notificationArray.push(Notification.find({jobType:u})
+                    .limit(limit)
+                    .skip(offset)
+                    .exec());
                    
                 })
                 return Promise.all(notificationArray);
             })
             .then(result =>{
-                //console.log(result)
                 var resultArray = [];
                 result.forEach(element=>{
                    element.forEach(u =>{

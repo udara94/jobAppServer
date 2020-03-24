@@ -13,6 +13,12 @@ exports.add_new_job = (req, res) => {
         jobId: req.body.jobId,
         jobType: req.body.jobType,
         jobDescription: req.body.jobDescription,
+        jobSkill: req.body.jobSkill,
+        jobQualification: req.body.jobQualification,
+        experience: req.body.experience,
+        salary: req.body.salary,
+        address: req.body.address,
+        webSite: req.body.webSite,
         jobRole: req.body.jobRole,
         employer: req.body.employer,
         employerEmail: req.body.employerEmail,
@@ -104,10 +110,10 @@ exports.get_all_jobs_by_type = (req, res) => {
     const limit = Math.max(0, req.query.limit)
     const offset = Math.max(0, req.query.offset)
 
-    JobItem.find({ 
+    JobItem.find({
         jobType: req.query.jobType,
         jobField: req.query.jobField
-     })
+    })
         .limit(limit)
         .skip(offset)
         .exec()
@@ -139,7 +145,7 @@ exports.get_job_role_by_type = (req, res) => {
 
     JobItem.find({
         jobType: req.query.jobType,
-        jobField:req.query.jobField
+        jobField: req.query.jobField
     })
         .exec()
         .then(jobs => {
@@ -164,7 +170,7 @@ exports.get_jobs_by_job_role = (req, res) => {
     JobItem.find({
         jobType: req.query.jobType,
         jobRole: req.query.jobRole,
-        jobField:req.query.jobField
+        jobField: req.query.jobField
     })
         .exec()
         .then(jobs => {
@@ -207,9 +213,15 @@ exports.update_job = (req, res) => {
         { _id: req.query.jobId },
         {
             $set: {
-                jobField:req.query.jobField,
+                jobField: req.query.jobField,
                 jobType: req.body.jobType,
                 jobDescription: req.body.jobDescription,
+                jobSkill: req.body.jobSkill,
+                jobQualification: req.body.jobQualification,
+                experience: req.body.experience,
+                salary: req.body.salary,
+                address: req.body.address,
+                webSite: req.body.webSite,
                 jobRole: req.body.jobRole,
                 employer: req.body.employer,
                 employerEmail: req.body.employerEmail,
@@ -236,17 +248,17 @@ exports.delete_job = (req, res) => {
     JobItem.deleteMany({
         _id: req.query.jobId
     })
-    .exec()
-    .then(job => {
-        update_job_count(req.query.jobType, false, 1)
-        res.status(200).json(job);
-    })
-    .catch(err => {
-        console.log(err);
-        res.status(500).json({
-            message: err.message
-        });
-    })
+        .exec()
+        .then(job => {
+            update_job_count(req.query.jobType, false, 1)
+            res.status(200).json(job);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                message: err.message
+            });
+        })
 }
 
 function update_job_count(jobType, isAdded, expiredSize) {
