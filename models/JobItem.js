@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const JobItemSchema = mongoose.Schema({
     jobField:{type: String,required: true},
     jobType: {type:String,required: true},
+    jobTypeName: {type:String,required: true},
     jobDescription: {type:Array},
     jobSkill: {type:Array},
     jobQualification:{type:Array},
