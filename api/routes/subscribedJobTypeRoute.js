@@ -8,4 +8,6 @@ router.get('/',verify, SubscribedJobTypeController.get_subscribed_job_types);
 
 router.post('/addJobTypeSubscription', verify, SubscribedJobTypeController.add_subscribed_job_types);
 
+router.get('/subAll',verify, SubscribedJobTypeController.subscribe_all_job_types);
+
 module.exports = router;
