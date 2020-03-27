@@ -6,8 +6,7 @@ const subscribedJobSchema = new mongoose.Schema({
         required: true,
     },
     jobType: {
-        type: String,
-        required:true,
+        type: Array,
     }
 });
 

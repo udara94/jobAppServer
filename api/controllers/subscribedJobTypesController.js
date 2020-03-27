@@ -19,15 +19,16 @@ exports.get_subscribed_job_types = (req, res) => {
             SubscribeJobTypes.find({
                 userId: req.user.userId
             })
-            .select('jobType')
                 .exec()
                 .then(subsResult => {
-                    subsResult.forEach(function (u) {
-                        subsJobsArray.push(JobTypeItem.find({ _id: u.jobType }))
+                    subsResult[0].jobType.forEach(function (u) {
+                        //console.log(u);
+                        subsJobsArray.push(JobTypeItem.find({ _id: u }))
                     })
                     return Promise.all(subsJobsArray);
-                }).then(result => {
-
+                })
+                .then(result => {
+                    console.log(result);
                     var subsArray = new Array();
                     result.forEach(element => {
                         subsArray.push(element[0])
@@ -55,6 +56,35 @@ exports.get_subscribed_job_types = (req, res) => {
             });
         })
 }
+exports.subscribe_all_job_types = (req, res) =>{
+
+    JobTypeItem.find()
+        .exec()
+        .then(jobTyps => {
+            var jobTypeArry = new Array();
+            jobTyps.forEach(element =>{
+                jobTypeArry.push(element._id);
+            })
+            var subscribeJobType = new SubscribeJobTypes({
+                userId: req.user.userId,
+                jobType: jobTypeArry
+            })
+            subscribeJobType.save()
+        
+            res.status(201).json({
+                message: 'Job type subscription created',
+            });
+           
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                message: err.message
+            });
+        })
+  
+
+}
 
 exports.add_subscribed_job_types = (req, res) => {
 
@@ -66,30 +96,56 @@ exports.add_subscribed_job_types = (req, res) => {
     })
         .then(subscribedResult => {
 
-            var subscribedArry = new Array();
-            subscribedResult.forEach(element => {
-                subscribedArry.push(element.jobType);
-            })
-            jobTypeArry.forEach(element => {
-                if (subscribedArry.indexOf(element) == -1) {
-                    //add new subscriptions
-                    var subscribeJobType = new SubscribeJobTypes({
-                        userId: req.user.userId,
-                        jobType: element
+
+            if (subscribedResult.length > 0) {
+                var subscribeJobTypeArry = [];
+                var tempArray = [];
+                subscribeJobTypeArry = subscribedResult[0].jobType;
+                // console.log(jobTypeArry);
+
+                jobTypeArry.forEach(jobType => {
+                    if (subscribeJobTypeArry.indexOf(jobType) == -1) {
+                        subscribeJobTypeArry.push(jobType)
+                    }
+                })
+                subscribeJobTypeArry.slice(0).forEach(jobType =>{
+                    if(jobTypeArry.indexOf(jobType) == -1){
+                       var index = subscribeJobTypeArry.indexOf(jobType)
+                       subscribeJobTypeArry.splice(index, 1);
+                    }
+                })
+                SubscribeJobTypes.updateOne({ userId: req.user.userId },
+                    {
+                        $set: {
+                            jobType: subscribeJobTypeArry
+                        }
                     })
-                    subscribeJobType.save()
-                }
-            })
-            subscribedArry.forEach(element => {
-                if (jobTypeArry.indexOf(element) == -1) {
-                    SubscribeJobTypes.deleteMany({
-                        jobType: element
-                    }).exec()
-                }
-            })
-            res.status(201).json({
-                message: 'Job type subscription updated',
-            });
+                    .exec()
+                    .then(result => {
+                        res.status(200).json({
+                            message: 'Job type subscription updated',
+                        });
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        res.status(500).json({
+                            message: err.message
+                        });
+                    })
+
+            }
+            else {
+                var subscribeJobType = new SubscribeJobTypes({
+                    userId: req.user.userId,
+                    jobType: jobTypeArry
+                })
+                subscribeJobType.save()
+
+                res.status(201).json({
+                    message: 'Job type subscription created',
+                });
+
+            }
 
         })
         .catch(err => {

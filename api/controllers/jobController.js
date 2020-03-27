@@ -33,7 +33,7 @@ exports.add_new_job = (req, res) => {
         })
         job.save()
             .then(result => {
-                console.log(result);
+                //console.log(result);
                 var jobType = result.jobType;
     
                 //update the job count
@@ -44,7 +44,7 @@ exports.add_new_job = (req, res) => {
                 NotificationController.add_notification(result);
     
                 //create notifiaction
-                utilities.create_activity("5e6b6d72e8416f3ef89c8745","5e6b6d72e8416f3ef89c8745","likes")
+                utilities.create_activity(jobType, "5e6b6d72e8416f3ef89c8745","5e6b6d72e8416f3ef89c8745","likes")
                 res.status(200).json({
                     message: "Job Crated Successfully"
                 });

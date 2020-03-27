@@ -114,9 +114,11 @@ exports.user_register_fcm_token = (req, res, next) => {
     });
   }
 
-  module.exports.trigerNotifications = (activity) => {
+  module.exports.trigerNotifications = (activity, userId) => {
     if (activity){
-      Fcm.find()
+      Fcm.find({
+        userId: userId
+      })
         .select('userId fcmtoken')
         .exec()
         .then(tokens => {
@@ -135,26 +137,25 @@ exports.user_register_fcm_token = (req, res, next) => {
         .catch(err => {
           console.log(err);
         });
-
-      FcmTemp.find()
-      .exec()
-      .then(tempTokens => {
-        var tempTokenList = []
-        tempTokens.forEach((eachToken) => {
-              if(eachToken.fcmtoken)
-                tempTokenList.push(eachToken.fcmtoken)
-          });
-
-          if(tempTokenList && tempTokenList.length > 0){
-            tigerToAll(activity, tempTokenList);
-          }
-      })
-      .catch(err => {
-        console.log(err);
-      });
     } else {
         console.log("Notification Not Found");
     }
+}
+module.exports.tigerToAll = (activity, regIdArray) => {
+  if(regIdArray.length < 1000){
+    tigerNotifications(activity, regIdArray);
+  } else{
+    const folds = regIdArray.length % 1000
+
+    for (let i = 0; i < folds; i++) {
+        let start = i * 1000,
+            end = (i + 1) * 1000
+        var registrationTokens = regIdArray.slice(start, end).map((item) => {
+            return item
+        });
+        tigerNotifications(activity, registrationTokens);
+    }
+  }
 }
 
 const tigerToAll = (activity, regIdArray) => {
@@ -179,6 +180,7 @@ const tigerNotifications = (activity, registrationTokens) => {
     HtmlString.create_notific_html(activity.creatorId, activity.action, activity.tourId, activity.date, function(response){
   
           if(activity){
+            console.log(response);
             var payload = {
               // notification: {
               //   body: convert_date(newActivity.date).toString(),
