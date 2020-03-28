@@ -122,6 +122,7 @@ exports.user_register_fcm_token = (req, res, next) => {
         .select('userId fcmtoken')
         .exec()
         .then(tokens => {
+          console.log(tokens);
             var tokenList = []
             tokens.forEach((eachToken) => {
                 if (eachToken.userId.toString() != activity.creatorId.toString()) {
@@ -180,7 +181,7 @@ const tigerNotifications = (activity, registrationTokens) => {
     HtmlString.create_notific_html(activity.creatorId, activity.action, activity.tourId, activity.date, function(response){
   
           if(activity){
-            console.log(response);
+            //console.log(response);
             var payload = {
               // notification: {
               //   body: convert_date(newActivity.date).toString(),
@@ -207,8 +208,8 @@ const tigerNotifications = (activity, registrationTokens) => {
   
             admin.messaging().sendToDevice(registrationTokens, payload, options)
               .then(function(response) {
-                console.log("successfully sent Notifications:");
-                console.log("registrationTokens:" +registrationTokens);
+                //console.log("successfully sent Notifications:");
+                //console.log("registrationTokens:" +registrationTokens);
               })
               .catch(function(error) {
                 console.log(error);

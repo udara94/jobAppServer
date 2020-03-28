@@ -25,17 +25,18 @@ module.exports = {
         if (activity) {
 
 
-          SubscribeJobTypes.find({
-            jobType: jobType
-          })
+          SubscribeJobTypes.find()
             .exec()
             .then(subsResult => {
 
-              //res.status(200).json(subsResult);
-              var subsArry = new Array();
-              subsArry = subsResult;
-              subsArry.forEach(element => {
-                Fcm.trigerNotifications(activity, element.userId);
+              subsResult.forEach(element =>{
+                var jobTypeArry = new Array();
+                 jobTypeArry = element.jobType;
+                
+                 if(jobTypeArry.indexOf(jobType) >= 0){
+                  console.log(element.userId);
+                  Fcm.trigerNotifications(activity, element.userId);
+                 }
               })
 
               FcmTemp.find()

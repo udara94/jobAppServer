@@ -9,21 +9,23 @@ exports.get_all_notifications = (req, res) => {
 
     const limit = Math.max(0, req.query.limit)
     const offset = Math.max(0, req.query.offset)
+    var isSubsJobs = false;
 
     SubsJobs.countDocuments({userId: req.user.userId})
     .then(count =>{
-        console.log(count);
         if(count > 0){
             SubsJobs.find({ userId: req.user.userId })
             .exec()
             .then(user => {
                 var jobTypeArry = new Array();
                 var notificationArray = [];
-                 console.log(user);
-                user.forEach(element =>{
-                    jobTypeArry.push(element.jobType);
-                })
-    
+                
+                if(user != null && user.length > 0){
+                    if(user[0].jobType.length > 0){
+                        isSubsJobs = true
+                        jobTypeArry = user[0].jobType
+                    }
+                }
                 jobTypeArry.forEach(function (u) {
                     notificationArray.push(Notification.find({jobType:u})
                     .limit(limit)
@@ -34,17 +36,33 @@ exports.get_all_notifications = (req, res) => {
                 return Promise.all(notificationArray);
             })
             .then(result =>{
-                var resultArray = [];
-                result.forEach(element=>{
-                   element.forEach(u =>{
-                    resultArray.push(u);
-                   })
-                })
-               
-            const notificationList = new NotificationList({
-                notificationList: resultArray,
-            });
-                res.status(200).json(notificationList);
+                if(isSubsJobs){
+                    var resultArray = [];
+                    result.forEach(element=>{
+                       element.forEach(u =>{
+                        resultArray.push(u);
+                       })
+                    })
+                   
+                const notificationList = new NotificationList({
+                    notificationList: resultArray,
+                });
+                    res.status(200).json(notificationList);
+                }else{
+                    console.log("Im here");
+                        Notification.find()
+                        .limit(limit)
+                        .skip(offset)
+                        .exec()
+                        .then(result =>{
+                            const notificationList = new NotificationList({
+                                notificationList: result,
+                            });
+
+                            res.status(200).json(notificationList);
+                        })
+                }
+           
             })
             .catch(err => {
                 console.log(err);
