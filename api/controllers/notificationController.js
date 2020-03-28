@@ -49,7 +49,6 @@ exports.get_all_notifications = (req, res) => {
                 });
                     res.status(200).json(notificationList);
                 }else{
-                    console.log("Im here");
                         Notification.find()
                         .limit(limit)
                         .skip(offset)
@@ -91,7 +90,9 @@ exports.add_notification = (res) => {
         jobId: res._id,
         jobType: res.jobType,
         employer: res.employer,
-        notification: "New job added"
+        jobRole:res.jobRole,
+        notification: res.employer+" posted new job vacancy",
+        imgUrl: res.imgUrl
     })
     notification.save()
         .then(result => {
