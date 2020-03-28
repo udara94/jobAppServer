@@ -9,6 +9,13 @@ const notificationShema = new mongoose.Schema({
         type:String,
         required:true
     },
+    jobRole:{
+        type:String,
+        required: true
+    },
+    imgUrl:{
+        type:String
+    },
     employer:{
         type:String,
         required:true
