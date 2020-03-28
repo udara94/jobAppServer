@@ -28,6 +28,7 @@ exports.get_all_notifications = (req, res) => {
                 }
                 jobTypeArry.forEach(function (u) {
                     notificationArray.push(Notification.find({jobType:u})
+                    .sort({postedDate: -1})
                     .limit(limit)
                     .skip(offset)
                     .exec());
@@ -50,6 +51,7 @@ exports.get_all_notifications = (req, res) => {
                     res.status(200).json(notificationList);
                 }else{
                         Notification.find()
+                        .sort({postedDate: -1})
                         .limit(limit)
                         .skip(offset)
                         .exec()
@@ -72,6 +74,7 @@ exports.get_all_notifications = (req, res) => {
         }
         else{
             Notification.find()
+            .sort({postedDate: -1})
             .limit(limit)
             .skip(offset)
             .exec()

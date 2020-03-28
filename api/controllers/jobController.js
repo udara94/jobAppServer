@@ -10,59 +10,59 @@ const NotificationController = require('../controllers/notificationController');
 exports.add_new_job = (req, res) => {
 
     JobTypeItem.findById(req.body.jobType)
-    .exec()
-    .then(jobtype =>{
-        const job = new JobItem({
-            jobField: req.body.jobField,
-            jobId: req.body.jobId,
-            jobType: req.body.jobType,
-            jobTypeName: jobtype.jobType,
-            jobDescription: req.body.jobDescription,
-            jobSkill: req.body.jobSkill,
-            jobQualification: req.body.jobQualification,
-            experience: req.body.experience,
-            salary: req.body.salary,
-            address: req.body.address,
-            webSite: req.body.webSite,
-            jobRole: req.body.jobRole,
-            employer: req.body.employer,
-            employerEmail: req.body.employerEmail,
-            imgUrl: req.body.imgUrl,
-            closingDate: req.body.closingDate,
-            isExpired: req.body.isExpired,
+        .exec()
+        .then(jobtype => {
+            const job = new JobItem({
+                jobField: req.body.jobField,
+                jobId: req.body.jobId,
+                jobType: req.body.jobType,
+                jobTypeName: jobtype.jobType,
+                jobDescription: req.body.jobDescription,
+                jobSkill: req.body.jobSkill,
+                jobQualification: req.body.jobQualification,
+                experience: req.body.experience,
+                salary: req.body.salary,
+                address: req.body.address,
+                webSite: req.body.webSite,
+                jobRole: req.body.jobRole,
+                employer: req.body.employer,
+                employerEmail: req.body.employerEmail,
+                imgUrl: req.body.imgUrl,
+                closingDate: req.body.closingDate,
+                isExpired: req.body.isExpired,
+            })
+            job.save()
+                .then(result => {
+                    //console.log(result);
+                    var jobType = result.jobType;
+
+                    //update the job count
+                    update_job_count(jobType, true, 0);
+
+                    //add notification to notification document
+                    //add_notification(result);
+                    NotificationController.add_notification(result);
+
+                    //create notifiaction
+                    utilities.create_activity(jobType, "5e6b6d72e8416f3ef89c8745", "5e6b6d72e8416f3ef89c8745", "likes")
+                    res.status(200).json({
+                        message: "Job Crated Successfully"
+                    });
+                })
+                .catch(err => {
+                    console.log(err);
+                    res.status(500).json({
+                        message: err.message
+                    });
+                })
         })
-        job.save()
-            .then(result => {
-                //console.log(result);
-                var jobType = result.jobType;
-    
-                //update the job count
-                update_job_count(jobType, true, 0);
-    
-                //add notification to notification document
-                //add_notification(result);
-                NotificationController.add_notification(result);
-    
-                //create notifiaction
-                utilities.create_activity(jobType, "5e6b6d72e8416f3ef89c8745","5e6b6d72e8416f3ef89c8745","likes")
-                res.status(200).json({
-                    message: "Job Crated Successfully"
-                });
-            })
-            .catch(err => {
-                console.log(err);
-                res.status(500).json({
-                    message: err.message
-                });
-            })
-    })
-    .catch(err => {
-        console.log(err);
-        res.status(500).json({
-            message: err.message
-        });
-    })
-    
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                message: err.message
+            });
+        })
+
 }
 
 
@@ -75,6 +75,7 @@ exports.search_jobs = (req, res) => {
         "employer": { '$regex': key, $options: "i" },
         jobField: req.query.jobField
     })
+        .sort({ postedDate: -1 })
         .exec()
         .then(jobs => {
             var jobListArry = new Array();
@@ -97,6 +98,7 @@ exports.search_jobs = (req, res) => {
 exports.get_expired_jobs = (req, res) => {
 
     JobItem.find()
+        .sort({ postedDate: -1 })
         .exec()
         .then(jobs => {
             var jobListArry = new Array();
@@ -127,6 +129,7 @@ exports.get_all_jobs_by_type = (req, res) => {
         jobType: req.query.jobType,
         jobField: req.query.jobField
     })
+        .sort({ postedDate: -1 })
         .limit(limit)
         .skip(offset)
         .exec()
@@ -160,6 +163,7 @@ exports.get_job_role_by_type = (req, res) => {
         jobType: req.query.jobType,
         jobField: req.query.jobField
     })
+        .sort({ postedDate: -1 })
         .exec()
         .then(jobs => {
             var jobRoleArry = new Array();
@@ -185,6 +189,7 @@ exports.get_jobs_by_job_role = (req, res) => {
         jobRole: req.query.jobRole,
         jobField: req.query.jobField
     })
+        .sort({ postedDate: -1 })
         .exec()
         .then(jobs => {
             var jobListArry = new Array();
