@@ -39,7 +39,6 @@ exports.register_fcm_token_without_user = (req, res) =>{
     }
   })
   .catch(err => {
-    //console.log(err);
     res.status(500).json({
       message: err.message
     });
@@ -47,7 +46,6 @@ exports.register_fcm_token_without_user = (req, res) =>{
 }
 
 exports.user_register_fcm_token = (req, res, next) => {
-    //console.log("user id: "+req.user.userId)
     User.findOne({_id: req.user.userId})
     .exec()
     .then(user => {
@@ -61,7 +59,6 @@ exports.user_register_fcm_token = (req, res, next) => {
             Fcm.updateOne({userId: user._id}, {fcmtoken: req.body.fcmtoken})
               .exec()
               .then(result => {
-                //console.log(result);
                 res.status(200).json({
                   message: 'FCM Token Update Successful.'
                 });
@@ -80,14 +77,11 @@ exports.user_register_fcm_token = (req, res, next) => {
             fcm
               .save()
               .then(result => {
-               // console.log(result);
                 res.status(201).json({
                   message: 'FCM Token Registration Successful.'
                 });
               })
               .catch(err => {
-               // console.log(err);
-               // console.log("sswewfwewee");
                 res.status(500).json({
                   message: err.message
                 });
@@ -95,7 +89,6 @@ exports.user_register_fcm_token = (req, res, next) => {
           }
         })
         .catch(err => {
-          //console.log(err);
           res.status(500).json({
             message: err.message
           });
@@ -107,15 +100,13 @@ exports.user_register_fcm_token = (req, res, next) => {
       }
     })
     .catch(err => {
-      //console.log(err);
       res.status(500).json({
         message: err.message
       });
     });
   }
 
-  module.exports.trigerNotifications = (activity, userId) => {
-    if (activity){
+  module.exports.trigerNotifications = (userId, result) => {
       Fcm.find({
         userId: userId
       })
@@ -125,26 +116,21 @@ exports.user_register_fcm_token = (req, res, next) => {
           console.log(tokens);
             var tokenList = []
             tokens.forEach((eachToken) => {
-                if (eachToken.userId.toString() != activity.creatorId.toString()) {
                   if(eachToken.fcmtoken)
                     tokenList.push(eachToken.fcmtoken)
-                }
               });
 
               if(tokenList && tokenList.length > 0){
-                tigerToAll(activity, tokenList);
+                tigerToAll(tokenList, result);
               }
         })
         .catch(err => {
           console.log(err);
         });
-    } else {
-        console.log("Notification Not Found");
-    }
 }
-module.exports.tigerToAll = (activity, regIdArray) => {
+module.exports.tigerToAll = (regIdArray, result) => {
   if(regIdArray.length < 1000){
-    tigerNotifications(activity, regIdArray);
+    tigerNotifications(regIdArray, result);
   } else{
     const folds = regIdArray.length % 1000
 
@@ -154,14 +140,14 @@ module.exports.tigerToAll = (activity, regIdArray) => {
         var registrationTokens = regIdArray.slice(start, end).map((item) => {
             return item
         });
-        tigerNotifications(activity, registrationTokens);
+        tigerNotifications(registrationTokens, result);
     }
   }
 }
 
-const tigerToAll = (activity, regIdArray) => {
+const tigerToAll = (regIdArray, result) => {
     if(regIdArray.length < 1000){
-      tigerNotifications(activity, regIdArray);
+      tigerNotifications(regIdArray, result);
     } else{
       const folds = regIdArray.length % 1000
 
@@ -171,17 +157,18 @@ const tigerToAll = (activity, regIdArray) => {
           var registrationTokens = regIdArray.slice(start, end).map((item) => {
               return item
           });
-          tigerNotifications(activity, registrationTokens);
+          tigerNotifications(registrationTokens, result);
       }
     }
 }
 
-const tigerNotifications = (activity, registrationTokens) => {
+const tigerNotifications = (registrationTokens, result) => {
 
-    HtmlString.create_notific_html(activity.creatorId, activity.action, activity.tourId, activity.date, function(response){
+  var message = result.employer + " posted new job vacancy for "+ result.jobRole;
+
+    HtmlString.create_notific_html(result, function(response){
   
-          if(activity){
-            //console.log(response);
+    
             var payload = {
               // notification: {
               //   body: convert_date(newActivity.date).toString(),
@@ -190,11 +177,8 @@ const tigerNotifications = (activity, registrationTokens) => {
               //   sound : "default"
               // },
               data: {
-                _id: activity._id.toString(),
-                creatorId: activity.creatorId.toString(),
-                tourId: activity.tourId.toString(),
-                date: convert_date(activity.date).toString(),
-                action: activity.action,
+                date: message,
+                action: "new job",
                 content: response.content,
                 andoridContent: response.androidContent,
                 image: response.image,
@@ -215,7 +199,7 @@ const tigerNotifications = (activity, registrationTokens) => {
                 console.log(error);
                 console.log("Error sending Notifications:");
               });
-        }
+      //  }
     });
   
   }

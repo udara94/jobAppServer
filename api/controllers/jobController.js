@@ -33,18 +33,16 @@ exports.add_new_job = (req, res) => {
             })
             job.save()
                 .then(result => {
-                    //console.log(result);
                     var jobType = result.jobType;
 
                     //update the job count
                     update_job_count(jobType, true, 0);
 
                     //add notification to notification document
-                    //add_notification(result);
                     NotificationController.add_notification(result);
 
                     //create notifiaction
-                    utilities.create_activity(jobType, "5e6b6d72e8416f3ef89c8745", "5e6b6d72e8416f3ef89c8745", "likes")
+                    utilities.create_activity(result)
                     res.status(200).json({
                         message: "Job Crated Successfully"
                     });
@@ -122,8 +120,8 @@ exports.get_expired_jobs = (req, res) => {
 
 exports.get_all_jobs_by_type = (req, res) => {
 
-    const limit = Math.max(0, req.query.limit)
-    const offset = Math.max(0, req.query.offset)
+    const limit = Math.max(0, req.query.limit);
+    const offset = Math.max(0, req.query.offset);
 
     JobItem.find({
         jobType: req.query.jobType,
@@ -184,12 +182,17 @@ exports.get_job_role_by_type = (req, res) => {
 
 exports.get_jobs_by_job_role = (req, res) => {
 
+    const limit = Math.max(0, req.query.limit);
+    const offset = Math.max(0, req.query.offset);
+
     JobItem.find({
         jobType: req.query.jobType,
         jobRole: req.query.jobRole,
         jobField: req.query.jobField
     })
         .sort({ postedDate: -1 })
+        .limit(limit)
+        .skip(offset)
         .exec()
         .then(jobs => {
             var jobListArry = new Array();
