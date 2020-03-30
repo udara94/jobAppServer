@@ -14,7 +14,7 @@ const JobItemSchema = mongoose.Schema({
     jobRole: {type:String,required: true},
     employer: {type:String,required: true},
     employerEmail: {type:String,},
-    imgUrl: {type:String,required: true},
+    imgUrl: {type:String},
     postedDate: {type: Date,default: Date.now},
     closingDate: {type:String,required: true},
     isExpired: {type:Boolean,required: true},

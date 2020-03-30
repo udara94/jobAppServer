@@ -11,7 +11,7 @@ module.exports = {
     var profileImage
     var employer;
 
-    profileImage = "https://www.dailynews.lk/sites/default/files/news/2017/06/05/z_pv-Cambio-Software.jpg"
+    profileImage = result.imgUrl
     employer = result.employer;
 
 

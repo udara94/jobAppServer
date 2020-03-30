@@ -21,19 +21,25 @@ exports.get_subscribed_job_types = (req, res) => {
             })
                 .exec()
                 .then(subsResult => {
-                    subsResult[0].jobType.forEach(function (u) {
-                        //console.log(u);
-                        subsJobsArray.push(JobTypeItem.find({ _id: u }))
-                    })
-                    return Promise.all(subsJobsArray);
+                    if(subsResult.length > 0){
+                        console.log(subsResult);
+                        subsResult[0].jobType.forEach(function (u) {
+                            subsJobsArray.push(JobTypeItem.find({ _id: u }))
+                        })
+                        return Promise.all(subsJobsArray);
+                    }else{
+                        return subsJobsArray;
+                    }
+                     
                 })
                 .then(result => {
                     console.log(result);
                     var subsArray = new Array();
-                    result.forEach(element => {
-                        subsArray.push(element[0])
-                    })
-
+                    if(result.length > 0){
+                        result.forEach(element => {
+                            subsArray.push(element[0])
+                        })
+                    }
                     const subsAndJonTypes = new SubsJobTypeItemList({
                         jobTypeItemList: jobTypeArry,
                         subsJobTypeItemList: subsArray
