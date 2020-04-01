@@ -8,6 +8,12 @@ const userShema = new mongoose.Schema({
     date: {
         type: Date,
         default: Date.now
+    },
+    token: {
+        type: String,
+    },
+    refreshToken: {
+        type:String,
     }
 });
 
