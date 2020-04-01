@@ -3,11 +3,10 @@ const { registerValidation, loginValidation } = require('../../validation');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const FcmTemp = require('../../models/FcmTemp');
+var moment = require('moment');
 
 
-exports.refresh_token = (req, res) => {
-
-
+exports.refresh_token = (req, res) => { 
   const refreshToken = req.body.refreshToken;
   if (refreshToken == null) return res.status(401);
   User.find({
@@ -17,7 +16,8 @@ exports.refresh_token = (req, res) => {
     .then(user => {
       if (user) {
         if (user[0].refreshToken != null) {
-          var token = user[0].refreshToken;
+          const token = user[0].refreshToken;
+          const expire = generateExpirationTime();
           jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, useres) => {
             if (err) return res.send(403);
             const accessToken = generateAccessToken(user[0]);
@@ -28,7 +28,10 @@ exports.refresh_token = (req, res) => {
                 }
               }).exec()
               .then(response => {
-                res.json({ token: accessToken })
+                res.json({ 
+                  token: accessToken,
+                  expire: expire
+                 })
               })
               .catch(err => {
                 res.status(500).json({
@@ -57,11 +60,8 @@ exports.user_signup = (req, res) => {
       if (user.length >= 1) {
         //login
         const token = generateAccessToken(user[0]);
-        const refreshToken = jwt.sign({
-          mobile: user[0].mobile,
-          userId: user[0]._id
-        },
-          process.env.REFRESH_TOKEN_SECRET);
+        const refreshToken = generateRefreshToken(user[0]);
+        const expire = generateExpirationTime();
 
         User.updateOne({ mobile: req.body.mobile },
           {
@@ -80,6 +80,7 @@ exports.user_signup = (req, res) => {
           message: 'Auth Successful',
           token: token,
           refreshToken: refreshToken,
+          expire: expire,
           userId: user[0]._id,
           mobile: user[0].mobile
         });
@@ -94,11 +95,8 @@ exports.user_signup = (req, res) => {
           .then(result => {
             delete_tempToken(req.body.fcmtoken);
             const token = generateAccessToken(result);
-            const refreshToken = jwt.sign({
-              mobile: result.mobile,
-              userId: result._id
-            },
-              process.env.REFRESH_TOKEN_SECRET)
+            const refreshToken = generateRefreshToken(result);
+            const expire = generateExpirationTime();
             User.updateOne({ mobile: result.mobile },
               {
                 $set: {
@@ -116,6 +114,7 @@ exports.user_signup = (req, res) => {
               message: 'Auth Successful',
               token: token,
               refreshToken: refreshToken,
+              expire: expire,
               userId: result._id,
               mobile: result.mobile
             });
@@ -145,9 +144,23 @@ function generateAccessToken(user) {
     },
     process.env.TOKEN_SECRET,
     {
-      expiresIn: "35m"
+      expiresIn: "5m"
     }
   )
+}
+
+function generateRefreshToken(user){
+  return jwt.sign({
+    mobile: user.mobile,
+    userId: user._id
+  },
+    process.env.REFRESH_TOKEN_SECRET)
+}
+
+function generateExpirationTime(){
+  var nowDate = Date.now();
+  var expir = nowDate + 3600;
+  return expir;
 }
 
 function delete_tempToken(fcmToken) {
