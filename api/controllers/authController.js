@@ -159,7 +159,7 @@ function generateRefreshToken(user){
 
 function generateExpirationTime(){
   var nowDate = Date.now();
-  var expir = nowDate + 3600;
+  var expir = nowDate + 300;
   return expir;
 }
 
