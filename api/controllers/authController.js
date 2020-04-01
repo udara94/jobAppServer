@@ -144,7 +144,7 @@ function generateAccessToken(user) {
     },
     process.env.TOKEN_SECRET,
     {
-      expiresIn: "5m"
+      expiresIn: "24h"
     }
   )
 }
@@ -159,7 +159,9 @@ function generateRefreshToken(user){
 
 function generateExpirationTime(){
   var nowDate = Date.now();
-  var expir = nowDate + 300;
+  console.log(nowDate)
+  var expir = nowDate + 86400;
+  console.log(expir)
   return expir;
 }
 
