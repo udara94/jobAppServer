@@ -5,7 +5,6 @@ const FcmTemp = require('../models/FcmTemp');
 
 module.exports = {
   create_activity: function (result) {
-
     
     SubscribeJobTypes.find()
     .exec()
@@ -16,7 +15,7 @@ module.exports = {
          jobTypeArry = element.jobType;
         
          if(jobTypeArry.indexOf(result.jobType) >= 0){
-          console.log(element.userId);
+          //console.log(element.userId);
           Fcm.trigerNotifications(element.userId, result);
          }
       })

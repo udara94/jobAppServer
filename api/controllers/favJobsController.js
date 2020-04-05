@@ -44,7 +44,8 @@ exports.get_fav_jobs = (req, res) => {
             var favJobItems = [];
             user.forEach(function (u) {
                 var jobId = u.jobId;
-                favJobItems.push(JobItem.findById(jobId));
+                favJobItems.push(JobItem.findById(jobId)
+                .sort({ postedDate: -1 }));
             });
             return Promise.all(favJobItems);
         })
