@@ -9,50 +9,62 @@ const NotificationController = require('../controllers/notificationController');
 
 exports.add_new_job = (req, res) => {
 
+    var cout = 0;
+
     JobTypeItem.findById(req.body.jobType)
         .exec()
         .then(jobtype => {
-            const job = new JobItem({
-                jobField: req.body.jobField,
-                jobId: req.body.jobId,
-                jobType: req.body.jobType,
-                jobTypeName: jobtype.jobType,
-                jobDescription: req.body.jobDescription,
-                jobSkill: req.body.jobSkill,
-                jobQualification: req.body.jobQualification,
-                experience: req.body.experience,
-                salary: req.body.salary,
-                address: req.body.address,
-                webSite: req.body.webSite,
-                jobRole: req.body.jobRole,
-                employer: req.body.employer,
-                employerEmail: req.body.employerEmail,
-                imgUrl: req.body.imgUrl,
-                closingDate: req.body.closingDate,
-                isExpired: req.body.isExpired,
+            var jobItems = req.body.jobItems;
+
+            jobItems.forEach(item => {
+
+                const job = new JobItem({
+                    jobField: item.jobField,
+                    jobId: item.jobId,
+                    jobType: item.jobType,
+                    jobTypeName: jobtype.jobType,
+                    jobDescription: item.jobDescription,
+                    jobSkill: item.jobSkill,
+                    jobQualification: item.jobQualification,
+                    experience: item.experience,
+                    salary: item.salary,
+                    address: item.address,
+                    webSite: item.webSite,
+                    jobRole: item.jobRole,
+                    employer: item.employer,
+                    employerEmail: item.employerEmail,
+                    imgUrl: item.imgUrl,
+                    closingDate: item.closingDate,
+                    isExpired: item.isExpired,
+                })
+                job.save()
+                    .then(result => {
+
+                        //add notification to notification document
+                        NotificationController.add_notification(result);
+
+                        //create notifiaction
+                        if (cout == 0) {
+                            utilities.create_activity(result)
+                        }
+                        //console.log(cout);
+                        cout++;
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        res.status(500).json({
+                            message: err.message
+                        });
+                    })
             })
-            job.save()
-                .then(result => {
-                    var jobType = result.jobType;
 
-                    //update the job count
-                    update_job_count(jobType, true, 0);
+            console.log(jobItems.length);
+            //update the job count
+            update_job_count(req.body.jobType, true, jobItems.length, 0);
+            res.status(200).json({
+                message: "Job Crated Successfully"
+            });
 
-                    //add notification to notification document
-                    NotificationController.add_notification(result);
-
-                    //create notifiaction
-                    utilities.create_activity(result)
-                    res.status(200).json({
-                        message: "Job Crated Successfully"
-                    });
-                })
-                .catch(err => {
-                    console.log(err);
-                    res.status(500).json({
-                        message: err.message
-                    });
-                })
         })
         .catch(err => {
             console.log(err);
@@ -138,7 +150,7 @@ exports.get_all_jobs_by_type = (req, res) => {
             expiredJobArray = OpenJobs.getExpiredJobs(jobs)
 
             if (expiredJobArray.length > 0) {
-                update_job_count(req.query.jobType, false, expiredJobArray.length)
+                update_job_count(req.query.jobType, false, 0, expiredJobArray.length)
                 delete_job(expiredJobArray);
             }
             const jobItemList = new JobItemList({
@@ -271,7 +283,7 @@ exports.delete_job = (req, res) => {
     })
         .exec()
         .then(job => {
-            update_job_count(req.query.jobType, false, 1)
+            update_job_count(req.query.jobType, false, 0, 1)
             res.status(200).json(job);
         })
         .catch(err => {
@@ -282,12 +294,12 @@ exports.delete_job = (req, res) => {
         })
 }
 
-function update_job_count(jobType, isAdded, expiredSize) {
+function update_job_count(jobType, isAdded, joblength, expiredSize) {
     JobTypeItem.findById(jobType)
         .then(jobType => {
             var jobCount;
             if (isAdded) {
-                jobCount = parseInt(jobType.jobCount) + 1;
+                jobCount = parseInt(jobType.jobCount) + joblength;
             } else {
                 jobCount = parseInt(jobType.jobCount) - expiredSize;
             }

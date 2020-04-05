@@ -113,12 +113,14 @@ exports.user_register_fcm_token = (req, res, next) => {
         .select('userId fcmtoken')
         .exec()
         .then(tokens => {
-          console.log(tokens);
+          //console.log("================");
+          //console.log(tokens);
             var tokenList = []
             tokens.forEach((eachToken) => {
                   if(eachToken.fcmtoken)
                     tokenList.push(eachToken.fcmtoken)
               });
+
 
               if(tokenList && tokenList.length > 0){
                 tigerToAll(tokenList, result);
@@ -193,7 +195,8 @@ const tigerNotifications = (registrationTokens, result) => {
             admin.messaging().sendToDevice(registrationTokens, payload, options)
               .then(function(response) {
                 //console.log("successfully sent Notifications:");
-                //console.log("registrationTokens:" +registrationTokens);
+                   //console.log("================");
+               // console.log("registrationTokens:" +registrationTokens);
               })
               .catch(function(error) {
                 console.log(error);
